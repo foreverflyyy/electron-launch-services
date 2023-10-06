@@ -1,0 +1,28 @@
+body {
+    font-family: Arial, sans-serif;
+}
+
+#tabs {
+    display: flex;
+    margin-bottom: 10px;
+}
+
+.tab {
+    padding: 10px 20px;
+    background-color: #999;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.tab.active {
+    background-color: #666;
+}
+
+#tab-content .tab-item {
+    display: none;
+    padding: 20px;
+}
+
+#tab-content .tab-item.active {
+    display: block;
+}

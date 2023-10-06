@@ -1,25 +1,22 @@
 <!DOCTYPE html>
-<html>
-<head>
-  <meta charset="UTF-8" />
-  <meta
-          http-equiv="Content-Security-Policy"
-          content="default-src 'self'; script-src 'self'"
-  />
-  <meta
-          http-equiv="X-Content-Security-Policy"
-          content="default-src 'self'; script-src 'self'"
-  />
-  <title>Hello from Electron renderer!</title>
-</head>
-<script src="./renderer.js"></script>
-<script src="./js/index.js"></script>
-<body>
-  <h1>Hello from Electron renderer!</h1>
-  <p>👋</p>
-  <p id="info"></p>
-  <button onclick="getMessage()">
-    Click me!
-  </button>
-</body>
+<html lang="ru">
+  <head>
+    <title>Electron Input</title>
+    <meta charset="UTF-8">
+  </head>
+  <body>
+    <h3>
+      Путь до файла services_config.js:
+      <div id="pathToFile" style="font-size: 16px; font-style: italic; font-weight: 600;"></div>
+    </h3>
+    <button id="selectFileButton">Выбрать файл</button>
+
+    <br/>
+    <br/>
+
+    <h3>Запустить микросервис:</h3>
+    <button id="commandButton">Start Command</button>
+
+    <script src="renderer.js"></script>
+  </body>
 </html>

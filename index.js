@@ -2,49 +2,70 @@ const {
     app,
     BrowserWindow,
     ipcMain,
-    Menu,
-    globalShortcut
-} = require('electron')
-const path = require('node:path');
-const appMenu = require('./scripts/appMenu');
-require('./js/index');
+    dialog
+} = require('electron');
+const { spawn } = require('child_process');
+const path = require('path');
 
-getMessage
+let mainWindow;
 
-function createWindow() {
-    const win = new BrowserWindow({
-        width: 800,
-        height: 600,
+app.on('ready', () => {
+    mainWindow = new BrowserWindow({
+        width: 1200,
+        height: 800,
         webPreferences: {
-            preload: path.join(__dirname, 'preload.js')
-        }
-    })
-
-    win.loadFile('index.html')
-};
-
-app.whenReady().then(() => {
-    // Для взаимодействия с Node.js
-    ipcMain.handle('ping', () => 'pong');
-    createWindow();
-
-    // Глобальные горячие клавиши
-    globalShortcut.register('Alt+CommandOrControl+I', () => {
-        console.log('Electron loves global shortcuts!')
-    })
-
-    // Запуск окна через macOS
-    app.on('activate', () => {
-        if (BrowserWindow.getAllWindows().length === 0) {
-            createWindow()
-        }
+            nodeIntegration: true,
+            contextIsolation: false,
+        },
     });
-
-    const template = appMenu();
-    const menu = Menu.buildFromTemplate(template);
-    Menu.setApplicationMenu(menu);
+    mainWindow.loadFile('index.html');
+    mainWindow.webContents.openDevTools();
 });
 
-app.on('window-all-closed', () => {
-    if (process.platform !== 'darwin') app.quit()
+// Открыть диалоговое окно и получить путь до файла
+ipcMain.on('openFile', (event) => {
+    // Диалоговое окно выбора файла
+    dialog.showOpenDialog({
+        properties: ['openFile'],
+        filters: [{ name: 'All Files', extensions: ['*'] }],
+    }).then((result) => {
+        if (!result.canceled && result.filePaths.length > 0) {
+            const selectedFilePath = result.filePaths[0];
+            mainWindow.webContents.send('selectedFilePath', selectedFilePath);
+        }
+    });
+});
+
+ipcMain.on('fileSelected', (event, selectedFilePath) => {
+    // Текущая рабочая директория
+    const currentWorkingDirectory = process.cwd();
+    // Преобразовать абсолютный путь в относительный
+    const relativePathToFile = path.relative(currentWorkingDirectory, selectedFilePath);
+
+    console.log('Относительный путь:', relativePathToFile);
+
+    try {
+        const exportedObject = require(relativePathToFile);
+        console.log('Объект из файла .js:', exportedObject);
+    } catch (err) {
+        console.error('Ошибка при выполнении кода файла:', err);
+    }
+});
+
+// Запустить команду для запуска микросервиса
+ipcMain.on('startButtonClicked', (event, inputValue) => {
+    const directoryPath = inputValue;
+    const npmStartProcess = spawn('npm', ['start'], { cwd: directoryPath });
+
+    npmStartProcess.stdout.on('data', (data) => {
+        console.log(`stdout: ${data}`);
+    });
+
+    npmStartProcess.stderr.on('data', (data) => {
+        console.error(`stderr: ${data}`);
+    });
+
+    npmStartProcess.on('close', (code) => {
+        console.log(`Child process exited with code ${code}`);
+    });
 });
