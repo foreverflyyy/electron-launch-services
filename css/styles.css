@@ -2,27 +2,25 @@ body {
     font-family: Arial, sans-serif;
 }
 
-#tabs {
-    display: flex;
-    margin-bottom: 10px;
-}
-
-.tab {
-    padding: 10px 20px;
-    background-color: #999;
-    cursor: pointer;
-    transition: background-color 0.3s;
-}
-
-.tab.active {
-    background-color: #666;
-}
-
-#tab-content .tab-item {
-    display: none;
+#microservices {
     padding: 20px;
+    display: flex;
+    flex-wrap: wrap;
 }
 
-#tab-content .tab-item.active {
-    display: block;
+.microservice {
+    width: 100px;
+    text-align: center;
+    padding: 7px;
+    margin: 3px;
+    color: white;
+    background-color: grey;
+    border-radius: 3px;
+    border: 2px solid #252525;
+    cursor: pointer;
+}
+
+.microservice:hover {
+    color: black;
+    background-color: white;
 }

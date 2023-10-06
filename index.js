@@ -42,20 +42,21 @@ ipcMain.on('fileSelected', (event, selectedFilePath) => {
     // Преобразовать абсолютный путь в относительный
     const relativePathToFile = path.relative(currentWorkingDirectory, selectedFilePath);
 
-    console.log('Относительный путь:', relativePathToFile);
-
     try {
         const exportedObject = require(relativePathToFile);
-        console.log('Объект из файла .js:', exportedObject);
+        mainWindow.webContents.send('fileContent', exportedObject);
     } catch (err) {
-        console.error('Ошибка при выполнении кода файла:', err);
+        console.error('Ошибка при получении списка микросервисов:', err);
     }
 });
 
 // Запустить команду для запуска микросервиса
-ipcMain.on('startButtonClicked', (event, inputValue) => {
-    const directoryPath = inputValue;
-    const npmStartProcess = spawn('npm', ['start'], { cwd: directoryPath });
+ipcMain.on('loadMicroservice', (event, objMicroservice) => {
+
+    console.log(1, objMicroservice);
+    return;
+
+    const npmStartProcess = spawn('npm', ['start'], { cwd: objMicroservice });
 
     npmStartProcess.stdout.on('data', (data) => {
         console.log(`stdout: ${data}`);

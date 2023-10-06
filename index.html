@@ -3,6 +3,7 @@
   <head>
     <title>Electron Input</title>
     <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/styles.css">
   </head>
   <body>
     <h3>
@@ -14,8 +15,12 @@
     <br/>
     <br/>
 
-    <h3>Запустить микросервис:</h3>
-    <button id="commandButton">Start Command</button>
+    <div id="tabs_microservices" style="display: none">
+      <h3>Список микросервисов:</h3>
+      <div id="microservices">
+
+      </div>
+    </div>
 
     <script src="renderer.js"></script>
   </body>
