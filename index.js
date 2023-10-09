@@ -1,11 +1,11 @@
+const path = require('path');
+const { exec } = require('child_process');
 const {
     app,
     BrowserWindow,
     ipcMain,
     dialog
 } = require('electron');
-const { spawn } = require('child_process');
-const path = require('path');
 
 let mainWindow;
 
@@ -37,8 +37,8 @@ ipcMain.on('openFile', (event) => {
 });
 
 ipcMain.on('fileSelected', (event, selectedFilePath) => {
-    // Текущая рабочая директория
-    const currentWorkingDirectory = process.cwd();
+    const currentWorkingDirectory = process.cwd(); // Текущая рабочая директория
+
     // Преобразовать абсолютный путь в относительный
     const relativePathToFile = path.relative(currentWorkingDirectory, selectedFilePath);
 
@@ -50,23 +50,20 @@ ipcMain.on('fileSelected', (event, selectedFilePath) => {
     }
 });
 
-// Запустить команду для запуска микросервиса
-ipcMain.on('loadMicroservice', (event, objMicroservice) => {
+ipcMain.on('loadMicroservice', (event, objMicroservice, pathToFileConfig) => {
 
-    console.log(1, objMicroservice);
-    return;
+    const commandToRun = `DIST=${objMicroservice.serviceName} npm start`;
+    const pathToDirectory = path.join(pathToFileConfig, "../");
 
-    const npmStartProcess = spawn('npm', ['start'], { cwd: objMicroservice });
-
-    npmStartProcess.stdout.on('data', (data) => {
-        console.log(`stdout: ${data}`);
-    });
-
-    npmStartProcess.stderr.on('data', (data) => {
-        console.error(`stderr: ${data}`);
-    });
-
-    npmStartProcess.on('close', (code) => {
-        console.log(`Child process exited with code ${code}`);
+    exec(`gnome-terminal --working-directory=${pathToDirectory} -- bash -c "${commandToRun}"`, (error, stdout, stderr) => {
+        if (error) {
+            console.error(`Ошибка выполнения команды: ${error.message}`);
+            return;
+        }
+        if (stderr) {
+            console.error(`Ошибка в выводе команды: ${stderr}`);
+            return;
+        }
+        console.log(`Стандартный вывод команды: ${stdout}`);
     });
 });

@@ -1,5 +1,6 @@
 const { ipcRenderer } = require('electron');
 
+let pathToFileConfig = "";
 const textPathToFile = document.getElementById('pathToFile');
 const selectFileButton = document.getElementById('selectFileButton');
 
@@ -9,6 +10,7 @@ selectFileButton.addEventListener('click', () => {
 
 ipcRenderer.on('selectedFilePath', (event, selectedFilePath) => {
     textPathToFile.innerText = selectedFilePath;
+    pathToFileConfig = selectedFilePath;
     ipcRenderer.send('fileSelected', selectedFilePath);
 });
 
@@ -23,7 +25,7 @@ ipcRenderer.on('fileContent', (event, exportedObject) => {
 
         serviceSection.addEventListener('click', () => {
             console.log(`You click on microservice - ${service.serviceName}`)
-            ipcRenderer.send('loadMicroservice', service);
+            ipcRenderer.send('loadMicroservice', service, pathToFileConfig);
         });
         serviceSection.innerText = service.serviceName;
         serviceSection.classList.add('microservice');
