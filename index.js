@@ -1,5 +1,5 @@
 const path = require('path');
-const { exec, spawn } = require('child_process');
+const { exec } = require('child_process');
 const {
     app,
     BrowserWindow,
@@ -7,7 +7,12 @@ const {
     dialog
 } = require('electron');
 
+const getAllServices = require('./utils/getAllServices');
+const addSuffixByServiceName = require('./utils/addSuffixByServiceName');
+const launchService = require('./utils/launchService');
+
 let mainWindow;
+let allServices = {}
 
 app.on('ready', () => {
     const ElectronStore = require('electron-store');
@@ -24,7 +29,6 @@ app.on('ready', () => {
 
     mainWindow.loadFile('index.html');
     mainWindow.webContents.send('startWork');
-    mainWindow.webContents.openDevTools();
 });
 
 // Открыть диалоговое окно и получить путь до файла
@@ -41,49 +45,36 @@ ipcMain.on('openFile', (event) => {
     });
 });
 
+// Получить объект с данными из файла
 ipcMain.on('fileSelected', (event, selectedFilePath) => {
-    // Текущая рабочая директория
-    const currentWorkingDirectory = process.cwd();
-
-    // Преобразовать абсолютный путь в относительный
-    const relativePathToFile = path.relative(currentWorkingDirectory, selectedFilePath);
-
     try {
-        const exportedObject = require(relativePathToFile);
+        const exportedObject = require(selectedFilePath);
+        allServices = getAllServices(exportedObject);
         mainWindow.webContents.send('fileContent', exportedObject);
     } catch (err) {
         console.error('Ошибка при получении списка микросервисов:', err);
     }
 });
 
-ipcMain.on('loadMicroservice', (event, objMicroservice, pathToFileConfig) => {
-    const serviceName = objMicroservice.serviceName;
-    const commandToRun = `DIST=${serviceName} npm start`;
-    const pathToDirectory = path.join(pathToFileConfig, "../");
+ipcMain.on('loadService', (event, data) => {
+    const { service, statusServices, directory, suffix } = data;
+    const allNeedServices = [service.serviceName, ...service.includeServices];
 
-    exec(`gnome-terminal --working-directory=${pathToDirectory} --title=${objMicroservice.serviceName} -- bash -c "${commandToRun}"`);
-    checkByIntervalProcess(objMicroservice);
+    console.log("loadService", service.serviceName);
+
+    for (const serviceName of allNeedServices) {
+        console.log("loadService", serviceName);
+        const nameWithSuffix = addSuffixByServiceName(serviceName, suffix);
+
+        if (!statusServices[nameWithSuffix]) {
+            const command = allServices[nameWithSuffix].commandByStart;
+            launchService(nameWithSuffix, command, directory, mainWindow);
+        }
+    }
 });
 
-ipcMain.on('stopMicroservice', (event, objMicroservice) => {
-    exec(`wmctrl -R ${objMicroservice.serviceName} && xdotool key --clearmodifiers ctrl+c `);
+ipcMain.on('stopService', (event, serviceName) => {
+    console.log("stopService", serviceName);
+    exec(`wmctrl -R ${serviceName} && xdotool key --clearmodifiers ctrl+c `);
+    mainWindow.webContents.send('changeStatusMicroservice', serviceName, false);
 });
-
-const checkByIntervalProcess = (objMicroservice) => {
-    const port = objMicroservice.port;
-    const serviceName = objMicroservice.serviceName;
-
-    const map = {};
-    map.interval = setInterval(() => {
-        exec(`lsof -i :${port}`, (error, stdout, stderr) => {
-            if (error) {
-                mainWindow.webContents.send('changeStatusMicroservice', serviceName, false);
-                clearInterval(map.interval);
-            }
-            if (stderr) {
-                mainWindow.webContents.send('changeStatusMicroservice', serviceName, false);
-                clearInterval(map.interval)
-            }
-        });
-    }, 1500)
-}

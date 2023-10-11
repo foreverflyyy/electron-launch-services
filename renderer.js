@@ -1,76 +1,44 @@
 const { ipcRenderer } = require('electron');
+const showSectionOfServices = require('./utils/showSectionOfServices');
+const setInitTags = require('./utils/setInitTags');
+
 const Store = require('electron-store');
 const store = new Store();
 
-let openPid = {}
-let pathToFileConfig = "";
-
-const textPathToFile = document.getElementById('pathToFile');
-const selectFileButton = document.getElementById('selectFileButton');
-
-selectFileButton.addEventListener('click', () => {
-    ipcRenderer.send('openFile');
-});
+const statusServices = {};
 
 ipcRenderer.on('startWork', (event) => {
+    setInitTags();
     const path = store.get('filePath');
 
     if(path)
         showPathAndGetData(path);
 });
-
 ipcRenderer.on('selectedFilePath', (event, selectedFilePath) => {
     store.set('filePath', selectedFilePath);
+    document.getElementById("tabs").innerHTML = "";
+
     showPathAndGetData(selectedFilePath);
 });
 
 const showPathAndGetData = (path) => {
-    textPathToFile.innerText = path;
-    pathToFileConfig = path;
+    document.getElementById('pathToFile').innerText = path;
     ipcRenderer.send('fileSelected', path);
 }
 
-// Добавьте обработчик для получения объекта из файла .js
 ipcRenderer.on('fileContent', (event, exportedObject) => {
-    const microservicesSection = document.getElementById('microservices');
-    const tabsMicroServ = document.getElementById('tabs_microservices');
-    tabsMicroServ.style.display = 'block';
-
-    exportedObject.forEach(service => {
-        const serviceName = service.serviceName;
-        openPid[serviceName] = false;
-
-        const serviceSection = document.createElement('div');
-        serviceSection.innerText = service.serviceName;
-        serviceSection.classList.add('microservice');
-        serviceSection.id = serviceName;
-
-        serviceSection.addEventListener('click', () => {
-            if(openPid[service.serviceName]) {
-                ipcRenderer.send('stopMicroservice', service);
-                changeStatusMicroservice(serviceName, false);
-            }
-            else {
-                ipcRenderer.send('loadMicroservice', service, pathToFileConfig);
-                changeStatusMicroservice(serviceName, true);
-            }
-        });
-
-        microservicesSection.appendChild(serviceSection);
-    });
+    for (const section of exportedObject)
+        showSectionOfServices(section, statusServices);
 });
 
-const changeStatusMicroservice = (nameMicroservice, value) => {
-    const serviceSection = document.getElementById(nameMicroservice);
+ipcRenderer.on('changeStatusMicroservice', (event, serviceName, value) => {
+    console.log('change', value)
+    const serviceSection = document.getElementById(serviceName);
 
     if(value)
         serviceSection.classList.add('active');
     else
         serviceSection.classList.remove("active");
 
-    openPid[nameMicroservice] = value;
-}
-
-ipcRenderer.on('changeStatusMicroservice', (event, nameMicroservice, value) => {
-    changeStatusMicroservice(nameMicroservice, value);
+    statusServices[serviceName] = value;
 });

@@ -2,13 +2,19 @@ body {
     font-family: Arial, sans-serif;
 }
 
-#microservices {
-    padding: 20px;
+#pathToFile {
+    font-size: 16px;
+    font-style: italic;
+    font-weight: 600;
+}
+
+.list__cells {
+    padding: 5px 20px;
     display: flex;
     flex-wrap: wrap;
 }
 
-.microservice {
+.cell {
     width: 100px;
     text-align: center;
     padding: 7px;
@@ -20,7 +26,7 @@ body {
     cursor: pointer;
 }
 
-.microservice:hover {
+.cell:hover {
     color: black;
     background-color: white;
 }
