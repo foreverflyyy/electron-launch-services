@@ -27,21 +27,15 @@ module.exports = (dataOfServices, statusServices) => {
         serviceSection.id = serviceName;
 
         serviceSection.addEventListener('click', () => {
-            if(statusServices[serviceName]) {
-                console.log('click break')
-                console.log('check')
+            if(statusServices[serviceName])
                 ipcRenderer.send('stopService', serviceName);
-            }
-            else {
-                console.log('click load')
-                console.log('check')
-                ipcRenderer.send('loadService', {
+            else
+                ipcRenderer.send('launchService', {
                     service,
                     statusServices,
                     suffix,
                     directory: dataOfServices.workingDirectory
                 });
-            }
         });
 
         listElement.appendChild(serviceSection);

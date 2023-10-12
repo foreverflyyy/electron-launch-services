@@ -8,9 +8,9 @@ module.exports = {
       name: '@electron-forge/maker-squirrel',
       config: {
         options: {
-          maintainer: 'Your Name',
+          maintainer: 'Launching services',
           homepage: 'https://example.com',
-          description: 'Your application description goes here.',
+          description: 'App for launch services.',
         },
       },
     },
@@ -22,9 +22,9 @@ module.exports = {
       name: '@electron-forge/maker-deb',
       config: {
         options: {
-          maintainer: 'Your Name',
+          maintainer: 'Launching services',
           homepage: 'https://example.com',
-          description: 'Your application description goes here.',
+          description: 'App for launch services.',
         },
       },
     },
@@ -32,9 +32,9 @@ module.exports = {
       name: '@electron-forge/maker-rpm',
       config: {
         options: {
-          maintainer: 'Your Name',
+          maintainer: 'Launching services',
           homepage: 'https://example.com',
-          description: 'Your application description goes here.',
+          description: 'App for launch services.',
         },
       },
     },
@@ -44,9 +44,9 @@ module.exports = {
       name: '@electron-forge/plugin-auto-unpack-natives',
       config: {
         options: {
-          maintainer: 'Your Name',
+          maintainer: 'Launching services',
           homepage: 'https://example.com',
-          description: 'Your application description goes here.',
+          description: 'App for launch services.',
         },
       },
     },

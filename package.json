@@ -1,7 +1,7 @@
 {
-  "name": "electron-load-microservices",
+  "name": "launching-services",
   "version": "1.0.0",
-  "description": "Your application description goes here.",
+  "description": "App for launch services.",
   "main": "index.js",
   "scripts": {
     "start": "electron-forge start",

@@ -7,13 +7,14 @@ const store = new Store();
 
 const statusServices = {};
 
-ipcRenderer.on('startWork', (event) => {
+document.addEventListener('DOMContentLoaded', function() {
     setInitTags();
     const path = store.get('filePath');
 
     if(path)
         showPathAndGetData(path);
 });
+
 ipcRenderer.on('selectedFilePath', (event, selectedFilePath) => {
     store.set('filePath', selectedFilePath);
     document.getElementById("tabs").innerHTML = "";
@@ -32,7 +33,6 @@ ipcRenderer.on('fileContent', (event, exportedObject) => {
 });
 
 ipcRenderer.on('changeStatusMicroservice', (event, serviceName, value) => {
-    console.log('change', value)
     const serviceSection = document.getElementById(serviceName);
 
     if(value)

@@ -1,5 +1,6 @@
-const path = require('path');
 const { exec } = require('child_process');
+const path = require('path');
+const url = require('url');
 const {
     app,
     BrowserWindow,
@@ -27,9 +28,19 @@ app.on('ready', () => {
         },
     });
 
-    mainWindow.loadFile('index.html');
-    mainWindow.webContents.send('startWork');
+    // mainWindow.loadFile('index.html');
+    mainWindow.loadURL(url.format({
+        pathname: path.join(__dirname, 'index.html'),
+        protocol: 'file:',
+        slashes: true
+    }));
+    mainWindow.on("closed", () => {});
+    mainWindow.webContents.reloadIgnoringCache();
+    mainWindow.webContents.on('did-finish-load', function() {mainWindow.show();});
+    mainWindow.webContents.session.clearCache(function() {console.log("Cache has been cleared.");});
 });
+
+app.on("activate", () => {});
 
 // Открыть диалоговое окно и получить путь до файла
 ipcMain.on('openFile', (event) => {
@@ -56,14 +67,11 @@ ipcMain.on('fileSelected', (event, selectedFilePath) => {
     }
 });
 
-ipcMain.on('loadService', (event, data) => {
+ipcMain.on('launchService', (event, data) => {
     const { service, statusServices, directory, suffix } = data;
     const allNeedServices = [service.serviceName, ...service.includeServices];
 
-    console.log("loadService", service.serviceName);
-
     for (const serviceName of allNeedServices) {
-        console.log("loadService", serviceName);
         const nameWithSuffix = addSuffixByServiceName(serviceName, suffix);
 
         if (!statusServices[nameWithSuffix]) {
@@ -74,7 +82,6 @@ ipcMain.on('loadService', (event, data) => {
 });
 
 ipcMain.on('stopService', (event, serviceName) => {
-    console.log("stopService", serviceName);
     exec(`wmctrl -R ${serviceName} && xdotool key --clearmodifiers ctrl+c `);
     mainWindow.webContents.send('changeStatusMicroservice', serviceName, false);
 });

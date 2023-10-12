@@ -1,21 +1,37 @@
 # Ris Microservices Electron
 
+## Инструкции по использованию:
 
-## For launch this application, you need to have this two packages
+### Работа с приложением:
+- выберите файл services_config_by_electron.js
+- у вас откроется список доступных сервисов
+- первое нажатие на сервис - его запуск в отдельном окне, второе нажатие - его прекращение
+
+### Запуск приложения (для использования):
+- установить пакеты:
 ```
 sudo apt install wmctrl
 sudo apt install xdotool
 ```
 
-## Getting started
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+- Запустить установщик (.deb)
+- Запустить файл run.sh
+  - или команду в терминале:
+    ```
+        usr/bin/electron-load-microservices
+    ```
 
-## Add your files
+### Запуск приложения (для разработки):
+```
+npm start
+```
 
+- Запустить установщик
+- Запустить файл run.sh
+
+### Сборка проекта
 ```
-cd existing_repo
-git remote add origin https://gitlab.com/psilog/ris-microservices-electron.git
-git branch -M main
-git push -uf origin main
+npm run make
 ```
+- После этого, запустить установщик (path: out/make/deb/x64/electron-load-...-amd64.deb)
+- Запустить файл run.sh
